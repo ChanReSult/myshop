@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.result.my.shop.web.admin.dao.TbContentDao">
+
+    <sql id="tbContentColumnns">
+            a.`id`,
+            a.`category_id` AS `categoryId`,
+            a.`title`,
+            a.`sub_title` AS `subTitle`,
+            a.`title_desc` AS `titleDesc`,
+            a.`url`,
+            a.`pic`,
+            a.`pic2`,
+            a.`content`,
+            a.`created`,
+            a.`updated`,
+            b.`id` as "tbContentCategory.id",
+            b.`name` as "tbContentCategory.name"
+    </sql>
+
+    <sql id="tbContentJoins">
+        LEFT JOIN `tb_content_category` as b ON a.category_id = b.id
+    </sql>
+
+    <select id="selectAll" resultType="tbContent">
+        SELECT
+        <include refid="tbContentColumnns"></include>
+        FROM
+        `tb_content` AS a
+        <include refid="tbContentJoins"/>
+    </select>
+
+
+    <update id="update" parameterType="tbContent">
+            UPDATE
+              `tb_content`
+            SET
+              `category_id` = #{tbContentCategory.id},
+              `title` = #{title},
+              `sub_title` = #{subTitle},
+              `title_desc` = #{titleDesc},
+              `url` = #{url},
+              `pic` = #{pic},
+              `pic2` = #{pic2},
+              `content` = #{content},
+              `created` = #{created},
+              `updated` = #{updated}
+            WHERE `id` = #{id} ;
+
+    </update>
+
+
+    <insert id="insert" parameterType="tbContent">
+        INSERT INTO `tb_content` (
+          `category_id`,
+          `title`,
+          `sub_title`,
+          `title_desc`,
+          `url`,
+          `pic`,
+          `pic2`,
+          `content`,
+          `created`,
+          `updated`
+        )
+        VALUES
+          (
+            #{tbContentCategory.id},
+            #{title},
+            #{subTitle},
+            #{titleDesc},
+            #{url},
+            #{pic},
+            #{pic2},
+            #{content},
+            #{created},
+            #{updated}
+          ) ;
+    </insert>
+
+    <delete id="delete" parameterType="Long">
+        DELETE
+        FROM
+          `tb_content`
+        WHERE `id` = #{id} ;
+    </delete>
+
+
+    <select id="selectById" parameterType="long" resultType="tbContent">
+        SELECT
+            <include refid="tbContentColumnns"/>
+        FROM
+        `tb_content` as a
+            <include refid="tbContentJoins"/>
+        WHERE
+            a.`id` =  #{id} ;
+    </select>
+
+
+    <select id="search" parameterType="string" resultType="tbContent">
+        SELECT
+        <include refid="tbContentColumnns"></include>
+        FROM
+        `tb_content` as a
+        <where>
+            <if test="title != null and title !='' ">
+                and a.`title` like CONCAT('%',#{title},'%')
+            </if>
+            <if test="subTitle != null and subTitle !='' ">
+                and a.`sub_title` like CONCAT('%',#{sub_title},'%')
+            </if>
+            <if test="titleDesc != null and titleDesc !='' ">
+                and a.`title_desc` like CONCAT('%',#{title_desc},'%')
+            </if>
+        </where>
+    </select>
+
+
+</mapper>
+
+
+
